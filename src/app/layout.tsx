@@ -1,20 +1,20 @@
+'use client';
+
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AppProvider } from '@/context/AppContext';
+import { usePathname } from 'next/navigation';
 
 const inter = Inter({ subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'HR Dashboard',
-  description: 'HR Performance Dashboard for tracking employee performance',
-};
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -30,19 +30,31 @@ export default function RootLayout({
                     <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                       <a
                         href="/"
-                        className="inline-flex items-center border-b-2 border-blue-500 px-1 pt-1 text-sm font-medium text-gray-900"
+                        className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium${
+                          pathname === '/'
+                            ? ' border-blue-500 text-gray-900'
+                            : ' border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        }`}
                       >
                         Dashboard
                       </a>
                       <a
                         href="/bookmarks"
-                        className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                        className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium${
+                          pathname === '/bookmarks'
+                            ? ' border-blue-500 text-gray-900'
+                            : ' border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        }`}
                       >
                         Bookmarks
                       </a>
                       <a
                         href="/analytics"
-                        className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                        className={`inline-flex items-center border-b-2 px-1 pt-1 text-sm font-medium${
+                          pathname === '/analytics'
+                            ? ' border-blue-500 text-gray-900'
+                            : ' border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                        }`}
                       >
                         Analytics
                       </a>
