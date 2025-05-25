@@ -7,10 +7,17 @@ import Button from '@/components/ui/Button';
 import Rating from '@/components/ui/Rating';
 import Badge from '@/components/ui/Badge';
 import React from 'react';
+import { useParams } from 'next/navigation';
 
 interface Tab {
   id: string;
   label: string;
+}
+
+interface PerformanceReview {
+  date: string;
+  rating: number;
+  feedback: string;
 }
 
 const tabs: Tab[] = [
@@ -19,13 +26,12 @@ const tabs: Tab[] = [
   { id: 'feedback', label: 'Feedback' },
 ];
 
-export default function EmployeePage({ params }: { params: { id: string } }) {
-  // Use React.use to unwrap params as recommended by Next.js
-  const unwrappedParams = React.use(params);
-  const { state } = useApp();
+export default function EmployeePage() {
+  const { id } = useParams();
+  const { state, dispatch } = useApp();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const employee = state.employees.find((emp) => emp.id === parseInt(unwrappedParams.id));
+  const employee = state.employees.find((emp) => emp.id === Number(id));
 
   if (!employee) {
     return (
@@ -39,6 +45,26 @@ export default function EmployeePage({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  const isBookmarked = state.bookmarks.some((bookmark) => bookmark.employeeId === employee.id);
+
+  const handleBookmark = () => {
+    if (isBookmarked) {
+      dispatch({ type: 'REMOVE_BOOKMARK', payload: employee.id });
+    } else {
+      const bookmark = {
+        id: Date.now(),
+        employeeId: employee.id,
+        timestamp: new Date().toISOString(),
+      };
+      dispatch({ type: 'ADD_BOOKMARK', payload: bookmark });
+    }
+  };
+
+  const handlePromote = () => {
+    // In a real application, this would trigger a promotion workflow
+    alert(`Promotion workflow initiated for ${employee.firstName} ${employee.lastName}`);
+  };
 
   // Determine badge variant based on performance rating
   const getPerformanceBadgeVariant = (rating: number) => {
@@ -121,7 +147,7 @@ export default function EmployeePage({ params }: { params: { id: string } }) {
           <Card>
             <h3 className="text-lg font-medium text-gray-900">Performance History</h3>
             <div className="mt-4 space-y-4">
-              {employee.performanceHistory.map((review, index) => (
+              {employee.performanceHistory.map((review: PerformanceReview, index: number) => (
                 <div key={index} className="rounded-lg border border-gray-200 p-4">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-medium text-gray-900">
@@ -177,6 +203,21 @@ export default function EmployeePage({ params }: { params: { id: string } }) {
             </button>
           ))}
         </nav>
+      </div>
+
+      <div className="flex space-x-2">
+        <Button
+          variant={isBookmarked ? "secondary" : "outline"}
+          onClick={handleBookmark}
+        >
+          {isBookmarked ? "Bookmarked" : "Bookmark"}
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handlePromote}
+        >
+          Promote
+        </Button>
       </div>
 
       {renderTabContent()}
