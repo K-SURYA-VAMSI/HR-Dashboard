@@ -5,6 +5,7 @@ import { useApp } from '@/context/AppContext';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Rating from '@/components/ui/Rating';
+import Badge from '@/components/ui/Badge';
 import React from 'react';
 
 interface Tab {
@@ -38,6 +39,14 @@ export default function EmployeePage({ params }: { params: { id: string } }) {
       </div>
     );
   }
+
+  // Determine badge variant based on performance rating
+  const getPerformanceBadgeVariant = (rating: number) => {
+    if (rating >= 4) return 'success';
+    if (rating >= 3) return 'info';
+    if (rating >= 2) return 'warning';
+    return 'danger';
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -143,6 +152,9 @@ export default function EmployeePage({ params }: { params: { id: string } }) {
         </div>
         <div className="flex items-center space-x-2">
           <Rating value={employee.performance} size="lg" />
+          <Badge variant={getPerformanceBadgeVariant(employee.performance)}>
+            {employee.performance}/5
+          </Badge>
         </div>
       </div>
 
