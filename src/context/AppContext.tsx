@@ -14,6 +14,7 @@ interface AppState {
 type Action =
   | { type: 'SET_EMPLOYEES'; payload: Employee[] }
   | { type: 'ADD_BOOKMARK'; payload: Bookmark }
+  | { type: 'SET_BOOKMARKS'; payload: Bookmark[] }
   | { type: 'REMOVE_BOOKMARK'; payload: number }
   | { type: 'SET_FILTERS'; payload: Partial<FilterState> }
   | { type: 'SET_LOADING'; payload: boolean }
@@ -41,7 +42,12 @@ function appReducer(state: AppState, action: Action): AppState {
     case 'SET_EMPLOYEES':
       return { ...state, employees: action.payload };
     case 'ADD_BOOKMARK':
+      if (state.bookmarks.some(b => b.employeeId === action.payload.employeeId)) {
+        return state;
+      }
       return { ...state, bookmarks: [...state.bookmarks, action.payload] };
+    case 'SET_BOOKMARKS':
+      return { ...state, bookmarks: action.payload };
     case 'REMOVE_BOOKMARK':
       return {
         ...state,
@@ -61,8 +67,21 @@ function appReducer(state: AppState, action: Action): AppState {
   }
 }
 
+const LOCAL_STORAGE_KEY = 'hr-dashboard-bookmarks';
+
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  useEffect(() => {
+    const savedBookmarks = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (savedBookmarks) {
+      dispatch({ type: 'SET_BOOKMARKS', payload: JSON.parse(savedBookmarks) });
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.bookmarks));
+  }, [state.bookmarks]);
 
   useEffect(() => {
     async function fetchEmployees() {
@@ -71,7 +90,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         const response = await fetch('https://dummyjson.com/users?limit=20');
         const data = await response.json();
         
-        // Transform the data to match our Employee interface
         const employees: Employee[] = data.users.map((user: any) => ({
           id: user.id,
           firstName: user.firstName,

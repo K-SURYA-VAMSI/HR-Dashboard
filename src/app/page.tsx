@@ -101,13 +101,21 @@ export default function Home() {
               >
                 View
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleBookmark(employee)}
-              >
-                Bookmark
-              </Button>
+              {
+                state.bookmarks.some((bookmark) => bookmark.employeeId === employee.id) ? (
+                  <Button variant="secondary" size="sm" disabled>
+                    Bookmarked
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleBookmark(employee)}
+                  >
+                    Bookmark
+                  </Button>
+                )
+              }
               <Button
                 variant="secondary"
                 size="sm"
