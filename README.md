@@ -15,6 +15,9 @@ pnpm dev
 bun dev
 ```
 
+git-hub repo link-----
+[https://github.com/K-SURYA-VAMSI/hr-Dashboard.git]
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
