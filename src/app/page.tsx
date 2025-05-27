@@ -5,6 +5,8 @@ import { useApp } from '@/context/AppContext';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Rating from '@/components/ui/Rating';
+import Modal from '@/components/ui/Modal';
+import CreateUserForm from '@/components/CreateUserForm';
 import { Employee } from '@/types';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Fragment } from 'react';
@@ -14,6 +16,9 @@ import { clsx } from 'clsx';
 export default function Home() {
   const { state, dispatch } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  console.log('Dashboard page: employees:', state.employees);
 
   // Extract unique departments and performance ratings for filters
   const uniqueDepartments = Array.from(new Set(state.employees.map(emp => emp.department))).sort();
@@ -90,6 +95,12 @@ export default function Home() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900">Employee Dashboard</h2>
         <div className="flex items-center space-x-4">
+          <Button
+            variant="primary"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            Add Employee
+          </Button>
           <input
             type="text"
             placeholder="Search employees..."
@@ -241,6 +252,14 @@ export default function Home() {
           </Card>
         ))}
       </div>
+
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Add New Employee"
+      >
+        <CreateUserForm onClose={() => setIsCreateModalOpen(false)} />
+      </Modal>
     </div>
   );
 }

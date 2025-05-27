@@ -13,6 +13,7 @@ interface AppState {
 
 type Action =
   | { type: 'SET_EMPLOYEES'; payload: Employee[] }
+  | { type: 'ADD_EMPLOYEE'; payload: Employee }
   | { type: 'ADD_BOOKMARK'; payload: Bookmark }
   | { type: 'SET_BOOKMARKS'; payload: Bookmark[] }
   | { type: 'REMOVE_BOOKMARK'; payload: number }
@@ -41,6 +42,8 @@ function appReducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case 'SET_EMPLOYEES':
       return { ...state, employees: action.payload };
+    case 'ADD_EMPLOYEE':
+      return { ...state, employees: [...state.employees, action.payload] };
     case 'ADD_BOOKMARK':
       if (state.bookmarks.some(b => b.employeeId === action.payload.employeeId)) {
         return state;
@@ -68,10 +71,12 @@ function appReducer(state: AppState, action: Action): AppState {
 }
 
 const LOCAL_STORAGE_KEY = 'hr-dashboard-bookmarks';
+const CUSTOM_EMPLOYEES_KEY = 'hr-dashboard-custom-employees';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
+  // Load bookmarks from localStorage
   useEffect(() => {
     const savedBookmarks = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedBookmarks) {
@@ -79,17 +84,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Persist bookmarks to localStorage
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.bookmarks));
   }, [state.bookmarks]);
 
+  // Load employees from API and merge with custom employees from localStorage
   useEffect(() => {
     async function fetchEmployees() {
       dispatch({ type: 'SET_LOADING', payload: true });
       try {
         const response = await fetch('https://dummyjson.com/users?limit=20');
         const data = await response.json();
-        
         const employees: Employee[] = data.users.map((user: any) => ({
           id: user.id,
           firstName: user.firstName,
@@ -112,7 +118,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           })),
         }));
 
-        dispatch({ type: 'SET_EMPLOYEES', payload: employees });
+        // Load custom employees from localStorage
+        const customEmployeesRaw = localStorage.getItem(CUSTOM_EMPLOYEES_KEY);
+        let customEmployees: Employee[] = [];
+        if (customEmployeesRaw) {
+          try {
+            customEmployees = JSON.parse(customEmployeesRaw);
+            console.log('Loaded custom employees from localStorage:', customEmployees);
+          } catch (e) {
+            console.error('Failed to parse custom employees from localStorage', e);
+          }
+        }
+
+        // Merge API and custom employees
+        const allEmployees = [...employees, ...customEmployees];
+        console.log('All employees after merge:', allEmployees);
+        dispatch({ type: 'SET_EMPLOYEES', payload: allEmployees });
       } catch (error) {
         dispatch({ type: 'SET_ERROR', payload: 'Failed to fetch employees' });
       } finally {
@@ -125,6 +146,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
+      {console.log('AppProvider render: state:', state)}
       {children}
     </AppContext.Provider>
   );

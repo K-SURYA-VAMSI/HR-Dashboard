@@ -31,7 +31,18 @@ export default function EmployeePage() {
   const { state, dispatch } = useApp();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const employee = state.employees.find((emp) => emp.id === Number(id));
+  console.log('Employee details page: id from URL:', id);
+  console.log('Employee details page: all employees:', state.employees);
+
+  const employee = state.employees.find((emp) => emp.id.toString() === id?.toString());
+
+  if (state.loading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!employee) {
     return (
