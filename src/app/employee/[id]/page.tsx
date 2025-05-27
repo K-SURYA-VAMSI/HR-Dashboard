@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge';
 import React from 'react';
 import { useParams } from 'next/navigation';
 import { useBookmarks } from '@/hooks/useBookmarks';
+import FeedbackForm from '@/components/FeedbackForm';
 
 interface Tab {
   id: string;
@@ -29,7 +30,7 @@ const tabs: Tab[] = [
 
 export default function EmployeePage() {
   const { id } = useParams();
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
 
   const [activeTab, setActiveTab] = useState('overview');
@@ -71,6 +72,18 @@ export default function EmployeePage() {
   const handlePromote = () => {
     // In a real application, this would trigger a promotion workflow
     alert(`Promotion workflow initiated for ${employee.firstName} ${employee.lastName}`);
+  };
+
+  const handleFeedbackSubmit = (newFeedback: PerformanceReview) => {
+    dispatch({
+      type: 'UPDATE_EMPLOYEE',
+      payload: {
+        id: employee.id,
+        updates: {
+          performanceHistory: [...employee.performanceHistory, newFeedback],
+        },
+      },
+    });
   };
 
   // Determine badge variant based on performance rating
@@ -151,22 +164,30 @@ export default function EmployeePage() {
 
       case 'feedback':
         return (
-          <Card>
-            <h3 className="text-lg font-medium text-gray-900">Performance History</h3>
-            <div className="mt-4 space-y-4">
-              {employee.performanceHistory.map((review: PerformanceReview, index: number) => (
-                <div key={index} className="rounded-lg border border-gray-200 p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-gray-900">
-                      {new Date(review.date).toLocaleDateString()}
-                    </p>
-                    <Rating value={review.rating} size="sm" />
+          <div className="space-y-6">
+            <Card>
+              <h3 className="text-lg font-medium text-gray-900">Performance History</h3>
+              <div className="mt-4 space-y-4">
+                {employee.performanceHistory.map((review: PerformanceReview, index: number) => (
+                  <div key={index} className="rounded-lg border border-gray-200 p-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium text-gray-900">
+                        {new Date(review.date).toLocaleDateString()}
+                      </p>
+                      <Rating value={review.rating} size="sm" />
+                    </div>
+                    <p className="mt-2 text-sm text-gray-500">{review.feedback}</p>
                   </div>
-                  <p className="mt-2 text-sm text-gray-500">{review.feedback}</p>
-                </div>
-              ))}
-            </div>
-          </Card>
+                ))}
+              </div>
+            </Card>
+            <Card>
+              <h3 className="text-lg font-medium text-gray-900">Add New Feedback</h3>
+              <div className="mt-4">
+                <FeedbackForm employeeId={employee.id} onSubmit={handleFeedbackSubmit} />
+              </div>
+            </Card>
+          </div>
         );
 
       default:

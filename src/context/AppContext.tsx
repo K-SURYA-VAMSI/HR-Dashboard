@@ -12,6 +12,7 @@ interface AppState {
 type Action =
   | { type: 'SET_EMPLOYEES'; payload: Employee[] }
   | { type: 'ADD_EMPLOYEE'; payload: Employee }
+  | { type: 'UPDATE_EMPLOYEE'; payload: { id: number; updates: Partial<Employee> } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null };
 
@@ -32,6 +33,15 @@ function appReducer(state: AppState, action: Action): AppState {
       return { ...state, employees: action.payload };
     case 'ADD_EMPLOYEE':
       return { ...state, employees: [...state.employees, action.payload] };
+    case 'UPDATE_EMPLOYEE':
+      return {
+        ...state,
+        employees: state.employees.map(employee =>
+          employee.id === action.payload.id
+            ? { ...employee, ...action.payload.updates }
+            : employee
+        ),
+      };
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
