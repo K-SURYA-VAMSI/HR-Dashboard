@@ -21,6 +21,11 @@ export default function BookmarksPage() {
     alert(`Promotion workflow initiated for ${employee.firstName} ${employee.lastName}`);
   };
 
+  const handleAssignProject = (employee: any) => {
+    // This is a UI action - in a real app, this would open a project assignment modal/page
+    alert(`Assign Project UI action triggered for ${employee.firstName} ${employee.lastName}`);
+  };
+
   if (bookmarkedEmployees.length === 0) {
     return (
       <div className="flex h-96 flex-col items-center justify-center">
@@ -89,6 +94,13 @@ export default function BookmarksPage() {
                 onClick={() => handlePromote(employee)}
               >
                 Promote
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleAssignProject(employee)}
+              >
+                Assign to Project
               </Button>
             </div>
           </Card>

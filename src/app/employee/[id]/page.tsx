@@ -74,6 +74,31 @@ export default function EmployeePage() {
     alert(`Promotion workflow initiated for ${employee.firstName} ${employee.lastName}`);
   };
 
+  const handleAssignProject = () => {
+    const availableProjects = [
+      'Website Redesign',
+      'Mobile App Development',
+      'Database Migration',
+      'Cloud Migration',
+      'Security Audit',
+      'UI/UX Redesign'
+    ].filter(project => !employee.assignedProjects?.includes(project));
+
+    if (availableProjects.length === 0) {
+      alert('No more projects available to assign');
+      return;
+    }
+
+    const randomProject = availableProjects[Math.floor(Math.random() * availableProjects.length)];
+    dispatch({
+      type: 'ASSIGN_PROJECT',
+      payload: {
+        id: employee.id,
+        project: randomProject
+      }
+    });
+  };
+
   const handleFeedbackSubmit = (newFeedback: PerformanceReview) => {
     dispatch({
       type: 'UPDATE_EMPLOYEE',
@@ -145,19 +170,23 @@ export default function EmployeePage() {
           <Card>
             <h3 className="text-lg font-medium text-gray-900">Current Projects</h3>
             <div className="mt-4 space-y-4">
-              {['Project A', 'Project B', 'Project C'].map((project, index) => (
-                <div key={index} className="rounded-lg border border-gray-200 p-4">
-                  <h4 className="font-medium text-gray-900">{project}</h4>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Project description and details would go here.
-                  </p>
-                  <div className="mt-2">
-                    <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                      In Progress
-                    </span>
+              {employee.assignedProjects && employee.assignedProjects.length > 0 ? (
+                employee.assignedProjects.map((project, index) => (
+                  <div key={index} className="rounded-lg border border-gray-200 p-4">
+                    <h4 className="font-medium text-gray-900">{project}</h4>
+                    <p className="mt-1 text-sm text-gray-500">
+                      Project description and details would go here.
+                    </p>
+                    <div className="mt-2">
+                      <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                        In Progress
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No projects assigned yet.</p>
+              )}
             </div>
           </Card>
         );
@@ -245,6 +274,12 @@ export default function EmployeePage() {
           onClick={handlePromote}
         >
           Promote
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={handleAssignProject}
+        >
+          Assign Project
         </Button>
       </div>
 

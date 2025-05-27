@@ -14,7 +14,8 @@ type Action =
   | { type: 'ADD_EMPLOYEE'; payload: Employee }
   | { type: 'UPDATE_EMPLOYEE'; payload: { id: number; updates: Partial<Employee> } }
   | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null };
+  | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'ASSIGN_PROJECT'; payload: { id: number; project: string } };
 
 const initialState: AppState = {
   employees: [],
@@ -39,6 +40,21 @@ function appReducer(state: AppState, action: Action): AppState {
         employees: state.employees.map(employee =>
           employee.id === action.payload.id
             ? { ...employee, ...action.payload.updates }
+            : employee
+        ),
+      };
+    case 'ASSIGN_PROJECT':
+      return {
+        ...state,
+        employees: state.employees.map(employee =>
+          employee.id === action.payload.id
+            ? {
+                ...employee,
+                assignedProjects: [
+                  ...(employee.assignedProjects || []),
+                  action.payload.project
+                ]
+              }
             : employee
         ),
       };
@@ -83,6 +99,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             rating: Math.floor(Math.random() * 5) + 1,
             feedback: `Performance review for ${new Date(Date.now() - i * 30 * 24 * 60 * 60 * 1000).toLocaleDateString()}`,
           })),
+          assignedProjects: [
+            'Website Redesign',
+            'Mobile App Development',
+            'Database Migration'
+          ].slice(0, Math.floor(Math.random() * 3) + 1), // Randomly assign 1-3 projects
         }));
 
         // Load custom employees from localStorage

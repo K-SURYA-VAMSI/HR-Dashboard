@@ -117,6 +117,11 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             feedback: 'Initial performance review',
           },
         ],
+        assignedProjects: [
+          'Website Redesign',
+          'Mobile App Development',
+          'Database Migration'
+        ].slice(0, Math.floor(Math.random() * 3) + 1), // Randomly assign 1-3 projects
       };
 
       dispatch({ type: 'ADD_EMPLOYEE', payload: newEmployee });
