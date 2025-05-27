@@ -4,19 +4,16 @@ import { useApp } from '@/context/AppContext';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Rating from '@/components/ui/Rating';
+import { useBookmarks } from '@/hooks/useBookmarks';
 
 export default function BookmarksPage() {
-  const { state, dispatch } = useApp();
+  const { state } = useApp();
+  const { removeBookmark, getBookmarkedEmployees } = useBookmarks();
 
-  const bookmarkedEmployees = state.employees.filter((employee) =>
-    state.bookmarks.some((bookmark) => bookmark.employeeId === employee.id)
-  );
+  const bookmarkedEmployees = getBookmarkedEmployees(state.employees);
 
   const handleRemoveBookmark = (employeeId: number) => {
-    const bookmark = state.bookmarks.find((b) => b.employeeId === employeeId);
-    if (bookmark) {
-      dispatch({ type: 'REMOVE_BOOKMARK', payload: bookmark.id });
-    }
+    removeBookmark(employeeId);
   };
 
   const handlePromote = (employee: any) => {

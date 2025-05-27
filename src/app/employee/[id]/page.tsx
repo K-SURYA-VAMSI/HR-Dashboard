@@ -8,6 +8,7 @@ import Rating from '@/components/ui/Rating';
 import Badge from '@/components/ui/Badge';
 import React from 'react';
 import { useParams } from 'next/navigation';
+import { useBookmarks } from '@/hooks/useBookmarks';
 
 interface Tab {
   id: string;
@@ -28,7 +29,9 @@ const tabs: Tab[] = [
 
 export default function EmployeePage() {
   const { id } = useParams();
-  const { state, dispatch } = useApp();
+  const { state } = useApp();
+  const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
+
   const [activeTab, setActiveTab] = useState('overview');
 
   console.log('Employee details page: id from URL:', id);
@@ -57,18 +60,11 @@ export default function EmployeePage() {
     );
   }
 
-  const isBookmarked = state.bookmarks.some((bookmark) => bookmark.employeeId === employee.id);
-
   const handleBookmark = () => {
-    if (isBookmarked) {
-      dispatch({ type: 'REMOVE_BOOKMARK', payload: employee.id });
+    if (isBookmarked(employee.id)) {
+      removeBookmark(employee.id);
     } else {
-      const bookmark = {
-        id: Date.now(),
-        employeeId: employee.id,
-        timestamp: new Date().toISOString(),
-      };
-      dispatch({ type: 'ADD_BOOKMARK', payload: bookmark });
+      addBookmark(employee.id);
     }
   };
 
@@ -218,10 +214,10 @@ export default function EmployeePage() {
 
       <div className="flex space-x-2">
         <Button
-          variant={isBookmarked ? "secondary" : "outline"}
+          variant={isBookmarked(employee.id) ? "secondary" : "outline"}
           onClick={handleBookmark}
         >
-          {isBookmarked ? "Bookmarked" : "Bookmark"}
+          {isBookmarked(employee.id) ? "Bookmarked" : "Bookmark"}
         </Button>
         <Button
           variant="primary"

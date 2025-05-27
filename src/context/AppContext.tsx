@@ -5,8 +5,6 @@ import { Employee, Bookmark, FilterState } from '@/types';
 
 interface AppState {
   employees: Employee[];
-  bookmarks: Bookmark[];
-  filters: FilterState;
   loading: boolean;
   error: string | null;
 }
@@ -14,21 +12,11 @@ interface AppState {
 type Action =
   | { type: 'SET_EMPLOYEES'; payload: Employee[] }
   | { type: 'ADD_EMPLOYEE'; payload: Employee }
-  | { type: 'ADD_BOOKMARK'; payload: Bookmark }
-  | { type: 'SET_BOOKMARKS'; payload: Bookmark[] }
-  | { type: 'REMOVE_BOOKMARK'; payload: number }
-  | { type: 'SET_FILTERS'; payload: Partial<FilterState> }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null };
 
 const initialState: AppState = {
   employees: [],
-  bookmarks: [],
-  filters: {
-    search: '',
-    departments: [],
-    performance: [],
-  },
   loading: false,
   error: null,
 };
@@ -44,23 +32,6 @@ function appReducer(state: AppState, action: Action): AppState {
       return { ...state, employees: action.payload };
     case 'ADD_EMPLOYEE':
       return { ...state, employees: [...state.employees, action.payload] };
-    case 'ADD_BOOKMARK':
-      if (state.bookmarks.some(b => b.employeeId === action.payload.employeeId)) {
-        return state;
-      }
-      return { ...state, bookmarks: [...state.bookmarks, action.payload] };
-    case 'SET_BOOKMARKS':
-      return { ...state, bookmarks: action.payload };
-    case 'REMOVE_BOOKMARK':
-      return {
-        ...state,
-        bookmarks: state.bookmarks.filter((b) => b.id !== action.payload),
-      };
-    case 'SET_FILTERS':
-      return {
-        ...state,
-        filters: { ...state.filters, ...action.payload },
-      };
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
@@ -70,24 +41,10 @@ function appReducer(state: AppState, action: Action): AppState {
   }
 }
 
-const LOCAL_STORAGE_KEY = 'hr-dashboard-bookmarks';
 const CUSTOM_EMPLOYEES_KEY = 'hr-dashboard-custom-employees';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
-
-  // Load bookmarks from localStorage
-  useEffect(() => {
-    const savedBookmarks = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (savedBookmarks) {
-      dispatch({ type: 'SET_BOOKMARKS', payload: JSON.parse(savedBookmarks) });
-    }
-  }, []);
-
-  // Persist bookmarks to localStorage
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state.bookmarks));
-  }, [state.bookmarks]);
 
   // Load employees from API and merge with custom employees from localStorage
   useEffect(() => {

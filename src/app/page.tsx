@@ -12,55 +12,26 @@ import { ChevronDownIcon } from '@heroicons/react/20/solid';
 import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
+import { useBookmarks } from '@/hooks/useBookmarks';
+import { useSearch } from '@/hooks/useSearch';
 
 const ITEMS_PER_PAGE = 9; // Number of employees to display per page
 
 export default function Home() {
-  const { state, dispatch } = useApp();
-  const [searchTerm, setSearchTerm] = useState('');
+  const { state } = useApp();
+  const { addBookmark, isBookmarked } = useBookmarks();
+  const { filters, filteredEmployees, handleSearchTermChange, handleDepartmentFilterChange, handleRatingFilterChange } = useSearch(state.employees);
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   console.log('Dashboard page: employees:', state.employees);
 
-  // Extract unique departments and performance ratings for filters
+  // Extract unique departments and performance ratings for filters from all employees
   const uniqueDepartments = Array.from(new Set(state.employees.map(emp => emp.department))).sort();
   const uniqueRatings = Array.from(new Set(state.employees.map(emp => emp.performance))).sort((a, b) => a - b);
 
-  const handleDepartmentFilter = (department: string) => {
-    const currentDepartments = state.filters.departments;
-    const newDepartments = currentDepartments.includes(department)
-      ? currentDepartments.filter(d => d !== department)
-      : [...currentDepartments, department];
-    dispatch({ type: 'SET_FILTERS', payload: { departments: newDepartments } });
-    setCurrentPage(1); // Reset to first page on filter change
-  };
-
-  const handleRatingFilter = (rating: number) => {
-    const currentRatings = state.filters.performance;
-    const newRatings = currentRatings.includes(rating)
-      ? currentRatings.filter(r => r !== rating)
-      : [...currentRatings, rating];
-    dispatch({ type: 'SET_FILTERS', payload: { performance: newRatings } });
-    setCurrentPage(1); // Reset to first page on filter change
-  };
-
-  const filteredEmployees = state.employees.filter((employee) => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = (
-      employee.firstName.toLowerCase().includes(searchLower) ||
-      employee.lastName.toLowerCase().includes(searchLower) ||
-      employee.email.toLowerCase().includes(searchLower) ||
-      employee.department.toLowerCase().includes(searchLower)
-    );
-
-    const matchesDepartment = state.filters.departments.length === 0 || state.filters.departments.includes(employee.department);
-    const matchesRating = state.filters.performance.length === 0 || state.filters.performance.includes(employee.performance);
-
-    return matchesSearch && matchesDepartment && matchesRating;
-  });
-
-  // Calculate pagination values
+  // Calculate pagination values based on filtered employees
   const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -72,13 +43,10 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleBookmark = (employee: Employee) => {
-    const bookmark = {
-      id: Date.now(),
-      employeeId: employee.id,
-      timestamp: new Date().toISOString(),
-    };
-    dispatch({ type: 'ADD_BOOKMARK', payload: bookmark });
+  // Handle filter/search changes and reset to page 1
+  const handleFilterChange = (callback: () => void) => {
+    callback();
+    setCurrentPage(1);
   };
 
   const handlePromote = (employee: Employee) => {
@@ -122,11 +90,8 @@ export default function Home() {
             type="text"
             placeholder="Search employees..."
             className="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setCurrentPage(1); // Reset to first page on search change
-            }}
+            value={filters.search}
+            onChange={(e) => handleFilterChange(() => handleSearchTermChange(e.target.value))}
           />
 
           {/* Department Filter */}
@@ -153,13 +118,13 @@ export default function Home() {
                     <Menu.Item key={department}>
                       {({ active }) => (
                         <button
-                          onClick={() => handleDepartmentFilter(department)}
+                          onClick={() => handleFilterChange(() => handleDepartmentFilterChange(department))}
                           className={clsx(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                             'block px-4 py-2 text-sm w-full text-left'
                           )}>
                           {department}
-                          {state.filters.departments.includes(department) && (
+                          {filters.departments.includes(department) && (
                             <span className="float-right text-blue-600">✓</span>
                           )}
                         </button>
@@ -195,13 +160,13 @@ export default function Home() {
                     <Menu.Item key={rating}>
                       {({ active }) => (
                         <button
-                          onClick={() => handleRatingFilter(rating)}
+                          onClick={() => handleFilterChange(() => handleRatingFilterChange(rating))}
                           className={clsx(
                             active ? 'bg-gray-100 text-gray-900' : 'text-gray-700',
                             'block px-4 py-2 text-sm w-full text-left'
                           )}>
                           {rating} Star{rating !== 1 && 's'}
-                          {state.filters.performance.includes(rating) && (
+                          {filters.performance.includes(rating) && (
                             <span className="float-right text-blue-600">✓</span>
                           )}
                         </button>
@@ -247,7 +212,7 @@ export default function Home() {
                 View
               </Button>
               {
-                state.bookmarks.some((bookmark) => bookmark.employeeId === employee.id) ? (
+                isBookmarked(employee.id) ? (
                   <Button variant="secondary" size="sm" disabled>
                     Bookmarked
                   </Button>
@@ -255,7 +220,7 @@ export default function Home() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleBookmark(employee)}
+                    onClick={() => addBookmark(employee.id)}
                   >
                     Bookmark
                   </Button>

@@ -14,6 +14,7 @@ import {
   LineElement,
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
+import { useBookmarks } from '@/hooks/useBookmarks';
 
 ChartJS.register(
   CategoryScale,
@@ -28,6 +29,7 @@ ChartJS.register(
 
 export default function AnalyticsPage() {
   const { state } = useApp();
+  const { bookmarks } = useBookmarks();
 
   // Calculate department-wise average ratings
   const departmentRatings = state.employees.reduce((acc, employee) => {
@@ -124,7 +126,7 @@ export default function AnalyticsPage() {
           <div className="rounded-lg bg-green-50 p-4">
             <p className="text-sm font-medium text-green-800">Bookmarked</p>
             <p className="mt-1 text-2xl font-semibold text-green-900">
-              {state.bookmarks.length}
+              {bookmarks.length}
             </p>
           </div>
           <div className="rounded-lg bg-purple-50 p-4">
