@@ -13,16 +13,19 @@ import { Fragment } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { clsx } from 'clsx';
 
+const ITEMS_PER_PAGE = 9; // Number of employees to display per page
+
 export default function Home() {
   const { state, dispatch } = useApp();
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   console.log('Dashboard page: employees:', state.employees);
 
   // Extract unique departments and performance ratings for filters
   const uniqueDepartments = Array.from(new Set(state.employees.map(emp => emp.department))).sort();
-  const uniqueRatings = Array.from(new Set(state.employees.map(emp => emp.performance))).sort();
+  const uniqueRatings = Array.from(new Set(state.employees.map(emp => emp.performance))).sort((a, b) => a - b);
 
   const handleDepartmentFilter = (department: string) => {
     const currentDepartments = state.filters.departments;
@@ -30,6 +33,7 @@ export default function Home() {
       ? currentDepartments.filter(d => d !== department)
       : [...currentDepartments, department];
     dispatch({ type: 'SET_FILTERS', payload: { departments: newDepartments } });
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
   const handleRatingFilter = (rating: number) => {
@@ -38,6 +42,7 @@ export default function Home() {
       ? currentRatings.filter(r => r !== rating)
       : [...currentRatings, rating];
     dispatch({ type: 'SET_FILTERS', payload: { performance: newRatings } });
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
   const filteredEmployees = state.employees.filter((employee) => {
@@ -54,6 +59,18 @@ export default function Home() {
 
     return matchesSearch && matchesDepartment && matchesRating;
   });
+
+  // Calculate pagination values
+  const totalPages = Math.ceil(filteredEmployees.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const employeesToDisplay = filteredEmployees.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Optional: Scroll to top of the page or employee list on page change
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleBookmark = (employee: Employee) => {
     const bookmark = {
@@ -106,7 +123,10 @@ export default function Home() {
             placeholder="Search employees..."
             className="rounded-md border border-gray-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reset to first page on search change
+            }}
           />
 
           {/* Department Filter */}
@@ -197,7 +217,7 @@ export default function Home() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredEmployees.map((employee) => (
+        {employeesToDisplay.map((employee) => (
           <Card key={employee.id} className="space-y-4">
             <div className="flex items-start justify-between">
               <div>
@@ -252,6 +272,29 @@ export default function Home() {
           </Card>
         ))}
       </div>
+
+      {/* Pagination Controls */}
+      {filteredEmployees.length > ITEMS_PER_PAGE && (
+        <div className="flex justify-center space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <span className="flex items-center text-sm font-medium text-gray-700">
+            Page {currentPage} of {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </Button>
+        </div>
+      )}
 
       <Modal
         isOpen={isCreateModalOpen}
