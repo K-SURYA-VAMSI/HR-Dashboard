@@ -28,8 +28,12 @@ ChartJS.register(
 );
 
 export default function AnalyticsPage() {
+  console.log('Rendering AnalyticsPage');
   const { state } = useApp();
   const { bookmarks } = useBookmarks();
+
+  console.log('AnalyticsPage - App state:', state);
+  console.log('AnalyticsPage - Bookmarks:', bookmarks);
 
   // Calculate department-wise average ratings
   const departmentRatings = state.employees.reduce((acc, employee) => {
@@ -89,6 +93,38 @@ export default function AnalyticsPage() {
       },
     },
   };
+
+  // Add loading state or error message if data is not available
+  if (state.loading) {
+    return (
+      <div className="flex h-96 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+      </div>
+    );
+  }
+
+  if (state.error) {
+    return (
+      <div className="rounded-md bg-red-50 p-4">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">Error</h3>
+            <div className="mt-2 text-sm text-red-700">{state.error}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if there are employees before calculating and rendering charts
+  if (!state.employees || state.employees.length === 0) {
+    return (
+      <div className="flex h-96 flex-col items-center justify-center">
+        <h2 className="text-2xl font-bold text-gray-900">No Employee Data</h2>
+        <p className="mt-2 text-gray-500">Unable to load employee data for analytics.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

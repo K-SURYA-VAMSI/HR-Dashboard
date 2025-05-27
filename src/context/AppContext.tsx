@@ -1,12 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
 import { Employee, Bookmark, FilterState } from '@/types';
 
 interface AppState {
   employees: Employee[];
   loading: boolean;
   error: string | null;
+  bookmarks: Bookmark[];
 }
 
 type Action =
@@ -15,12 +16,14 @@ type Action =
   | { type: 'UPDATE_EMPLOYEE'; payload: { id: number; updates: Partial<Employee> } }
   | { type: 'SET_LOADING'; payload: boolean }
   | { type: 'SET_ERROR'; payload: string | null }
+  | { type: 'SET_BOOKMARKS'; payload: Bookmark[] }
   | { type: 'ASSIGN_PROJECT'; payload: { id: number; project: string } };
 
 const initialState: AppState = {
   employees: [],
   loading: false,
   error: null,
+  bookmarks: [],
 };
 
 const AppContext = createContext<{
@@ -62,12 +65,15 @@ function appReducer(state: AppState, action: Action): AppState {
       return { ...state, loading: action.payload };
     case 'SET_ERROR':
       return { ...state, error: action.payload };
+    case 'SET_BOOKMARKS':
+      return { ...state, bookmarks: action.payload };
     default:
       return state;
   }
 }
 
 const CUSTOM_EMPLOYEES_KEY = 'hr-dashboard-custom-employees';
+const LOCAL_STORAGE_BOOKMARKS_KEY = 'hr-dashboard-bookmarks';
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
@@ -131,6 +137,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
     fetchEmployees();
   }, []);
+
+  // Load bookmarks from localStorage on mount
+  useEffect(() => {
+    console.log('Attempting to load bookmarks from localStorage...');
+    const savedBookmarks = localStorage.getItem(LOCAL_STORAGE_BOOKMARKS_KEY);
+    console.log('Raw bookmarks from localStorage:', savedBookmarks);
+    if (savedBookmarks) {
+      try {
+        const parsedBookmarks = JSON.parse(savedBookmarks);
+        dispatch({ type: 'SET_BOOKMARKS', payload: parsedBookmarks });
+        console.log('Successfully loaded and parsed bookmarks:', parsedBookmarks);
+      } catch (e) {
+        console.error('Failed to parse bookmarks from localStorage', e);
+        dispatch({ type: 'SET_BOOKMARKS', payload: [] }); // Reset bookmarks if parsing fails
+      }
+    } else {
+      console.log('No bookmarks found in localStorage.');
+      dispatch({ type: 'SET_BOOKMARKS', payload: [] });
+    }
+  }, []);
+
+  // Persist bookmarks to localStorage whenever they change
+  useEffect(() => {
+    console.log('Bookmarks state changed, saving to localStorage:', state.bookmarks);
+    localStorage.setItem(LOCAL_STORAGE_BOOKMARKS_KEY, JSON.stringify(state.bookmarks));
+  }, [state.bookmarks]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

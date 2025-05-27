@@ -5,12 +5,16 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Rating from '@/components/ui/Rating';
 import { useBookmarks } from '@/hooks/useBookmarks';
+import { useMemo } from 'react';
 
 export default function BookmarksPage() {
   const { state } = useApp();
-  const { removeBookmark, getBookmarkedEmployees } = useBookmarks();
+  const { bookmarks, removeBookmark } = useBookmarks();
 
-  const bookmarkedEmployees = getBookmarkedEmployees(state.employees);
+  const bookmarkedEmployees = useMemo(() => {
+    const bookmarkedEmployeeIds = bookmarks.map(b => b.employeeId);
+    return state.employees.filter(employee => bookmarkedEmployeeIds.includes(employee.id));
+  }, [bookmarks, state.employees]);
 
   const handleRemoveBookmark = (employeeId: number) => {
     removeBookmark(employeeId);
