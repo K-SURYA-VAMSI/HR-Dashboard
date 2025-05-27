@@ -174,7 +174,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.firstName ? 'border-red-300' : ''
             }`}
           />
@@ -193,7 +193,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="lastName"
             value={formData.lastName}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.lastName ? 'border-red-300' : ''
             }`}
           />
@@ -212,7 +212,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="email"
             value={formData.email}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.email ? 'border-red-300' : ''
             }`}
           />
@@ -231,7 +231,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="age"
             value={formData.age}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.age ? 'border-red-300' : ''
             }`}
           />
@@ -249,7 +249,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="department"
             value={formData.department}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900"
           >
             {departments.map((dept) => (
               <option key={dept} value={dept}>
@@ -269,7 +269,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="phone"
             value={formData.phone}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.phone ? 'border-red-300' : ''
             }`}
           />
@@ -288,7 +288,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="address"
             value={formData.address}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.address ? 'border-red-300' : ''
             }`}
           />
@@ -307,7 +307,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="city"
             value={formData.city}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.city ? 'border-red-300' : ''
             }`}
           />
@@ -326,7 +326,7 @@ export default function CreateUserForm({ onClose }: { onClose: () => void }) {
             id="postalCode"
             value={formData.postalCode}
             onChange={handleChange}
-            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
+            className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-gray-900 ${
               errors.postalCode ? 'border-red-300' : ''
             }`}
           />

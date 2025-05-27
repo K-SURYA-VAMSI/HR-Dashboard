@@ -1,9 +1,23 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## HR Dashboard
+
+This is a mini HR performance dashboard project built with Next.js, React, and Tailwind CSS. It allows HR managers to track employee performance, manage bookmarks, and view basic analytics.
 
 ## Getting Started
-![alt text](images/image.png) ![alt text](<images/Screenshot 2025-05-26 152438.png>) ![alt text](<images/Screenshot 2025-05-26 153240.png>) ![alt text](<images/Screenshot 2025-05-26 153516.png>) ![alt text](<images/Screenshot 2025-05-26 153551.png>) ![alt text](<images/Screenshot 2025-05-26 153601.png>) ![alt text](<images/Screenshot 2025-05-26 153612.png>)
+![alt text](<images/Screenshot 2025-05-27 142948.png>) ![alt text](<images/Screenshot 2025-05-27 143010.png>) ![alt text](<images/Screenshot 2025-05-27 143018.png>) ![alt text](<images/Screenshot 2025-05-27 143032.png>) ![alt text](<images/Screenshot 2025-05-27 143047.png>) ![alt text](<images/Screenshot 2025-05-27 143059.png>)
 
-First, run the development server:
+First, install the dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+Then, run the development server:
 
 ```bash
 npm run dev
@@ -15,14 +29,38 @@ pnpm dev
 bun dev
 ```
 
-git-hub repo link-----
-[https://github.com/K-SURYA-VAMSI/hr-Dashboard.git]
+Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Using the Application
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Upon opening the application, you will be directed to a login page.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Use the following demo credentials to log in:
+
+*   **Admin:** admin@hr.com / `admin123`
+*   **HR Manager:** hr@hr.com / `hr123`
+
+After logging in, you can navigate through the different sections of the dashboard using the navigation bar.
+
+## Implemented Features
+
+*   **Dashboard Homepage (`/`)**: Displays a list of employees with key information, performance ratings, and actions.
+*   **Search & Filter**: Filter employees by name, email, department, and performance rating.
+*   **Dynamic User Details Page (`/employee/[id]`)**: View detailed employee profiles, performance history, and assigned projects. Includes a tabbed interface.
+*   **Bookmark Manager (`/bookmarks`)**: See a list of bookmarked employees and remove them.
+*   **Analytics Page (`/analytics`)**: Provides basic charts for department performance and bookmark trends.
+*   **Create User**: Add new employees to the system via a modal form.
+*   **Pagination**: Navigate through the employee list on the dashboard.
+*   **Mock Authentication**: A simple login system with protected routes for demonstration purposes.
+
+## Tech Stack
+
+*   React (with Next.js App Router)
+*   Tailwind CSS
+*   JavaScript (ES6+)
+*   State Management: Context API
+*   Chart.js (for Analytics)
+
 
 ## Learn More
 
